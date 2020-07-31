@@ -4,11 +4,6 @@ import android.os.Handler
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
 
-//import io.reactivex.rxjava3.core.Observable
-//import io.reactivex.rxjava3.disposables.Disposable
-//import io.reactivex.rxjava3.kotlin.Observables
-//import io.reactivex.rxjava3.subjects.BehaviorSubject
-
 class TickerViewModel : ViewModel() {
     companion object {
         val TICKS_SQUAT7: List<TickType> = listOf(
@@ -37,15 +32,7 @@ class TickerViewModel : ViewModel() {
     }
 
     private var cancel:Boolean = false
-//    val ob_tick = MutableLiveData<Int>()
-//    val ob_repeat = MutableLiveData<Int>()
-//    val ob_alive = MutableLiveData<Boolean>()
-//    var ob_pausing = MutableLiveData<Boolean>()
-//    var ob_paused = MediatorLiveData<Boolean>().apply {
-//        val cb:(Boolean)->Unit = {_:Boolean-> _pausing && _alive == true}
-//        addSource(ob_alive,cb)
-//        addSource(ob_pausing,cb)
-//    }
+
     val propHolder = PropHolder()
     inner class Observables {
         val tick:MutableLiveData<Int> by propHolder.propMap
@@ -70,12 +57,6 @@ class TickerViewModel : ViewModel() {
         addSource(observables.pausing,cb)
     },false)
         private set
-
-//    var _tick:Int by LiveDataProp(ob_tick, 1)
-//    var _repeat:Int by LiveDataProp(ob_repeat, 1)
-//    var _alive:Boolean by LiveDataProp(ob_alive, false)
-//    var _pausing:Boolean by LiveDataProp(ob_pausing, false)
-//    val _paused:Boolean by LiveDataProp(ob_paused,false)
 
     fun start(ticks:List<TickType>, loopCount:Int) {
         if(alive) {

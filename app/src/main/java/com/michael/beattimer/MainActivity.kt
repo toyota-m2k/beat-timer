@@ -28,6 +28,13 @@ class MainActivity : AppCompatActivity() {
                 pauseButton.text = "Pause"
             }
         }
+        ticker.observables.alive.observe(this) {
+            val alive = it==true
+            squatButton.isEnabled = !alive
+            hiitButton.isEnabled = !alive
+            stopButton.isEnabled = alive
+            pauseButton.isEnabled = alive
+        }
 
 
 //        val before = System.currentTimeMillis();
@@ -39,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         squatButton?.setOnClickListener(this::squat)
         hiitButton?.setOnClickListener(this::hiit)
         pauseButton?.setOnClickListener(this::pause)
+        stopButton?.setOnClickListener(this::stop)
 
 //        var type = 1
 //        var count = 0
@@ -60,9 +68,16 @@ class MainActivity : AppCompatActivity() {
 //        runnable.run()
     }
 
+    override fun onPause() {
+        super.onPause()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        ticker?.observables.removeObservers(this)
+        ticker.observables.removeObservers(this)
+        if(isFinishing) {
+            ticker.stop()
+        }
     }
 
     fun updateCounter() {
@@ -84,6 +99,10 @@ class MainActivity : AppCompatActivity() {
             ticker.resume()
         }
     }
+    fun stop(@Suppress("UNUSED_PARAMETER") view: View) {
+        ticker.stop()
+    }
+
 
 //    fun onNextBeep(@Suppress("UNUSED_PARAMETER") view: View) {
 //        type++
