@@ -31,10 +31,24 @@ class LiveDataProp<R,T>(val data: MutableLiveData<T>, val defValue:T) : ReadWrit
         data.value = value
     }
 }
+class LiveDataNullableProp<R,T>(val data: MutableLiveData<T>, defValue:T?=null) : ReadWriteProperty<R, T?> {
+    init { data.value = defValue }
+    override fun getValue(thisRef: R, property: KProperty<*>): T? {
+        return data.value
+    }
+    override fun setValue(thisRef: R, property: KProperty<*>, value: T?) {
+        data.value = value
+    }
+}
 
 class ReadOnlyLiveDataProp<R,T>(val data: LiveData<T>, val defValue:T) : ReadOnlyProperty<R, T> {
     override fun getValue(thisRef: R, property: KProperty<*>): T {
         return data.value ?: defValue
+    }
+}
+class ReadOnlyLiveDataNullableProp<R,T>(val data: LiveData<T>) : ReadOnlyProperty<R, T?> {
+    override fun getValue(thisRef: R, property: KProperty<*>): T? {
+        return data.value
     }
 }
 
@@ -108,6 +122,10 @@ class PropHolder {
         propMap[name] = data
         return LiveDataProp(data,defValue)
     }
+    fun <R,T> addNullableProp(name:String, data:MutableLiveData<T>,defValue:T?=null) : LiveDataNullableProp<R,T> {
+        propMap[name] = data
+        return LiveDataNullableProp(data,defValue)
+    }
     /**
      * 読み取り専用の(val型の)プロパティを登録する
      * @return 委譲プロパティとして利用可能なReadOnlyLiveDataProp型インスタンス
@@ -115,6 +133,10 @@ class PropHolder {
     fun <R,T> addReadOnlyProp(name:String, data:LiveData<T>,defValue:T) : ReadOnlyLiveDataProp<R,T> {
         propMap[name] = data
         return ReadOnlyLiveDataProp(data,defValue)
+    }
+    fun <R,T> addReadOnlyNullableProp(name:String, data:LiveData<T>) : ReadOnlyLiveDataNullableProp<R,T> {
+        propMap[name] = data
+        return ReadOnlyLiveDataNullableProp(data)
     }
 
     /**

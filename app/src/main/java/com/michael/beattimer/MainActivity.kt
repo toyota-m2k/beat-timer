@@ -1,13 +1,13 @@
 package com.michael.beattimer
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    var cs = ClockSound()
-    var type = 0
     val ticker:TickerViewModel by lazy {
         TickerViewModel.getInstance(this)
     }
@@ -15,10 +15,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ticker.observables.repeat.observe(this) { v->
+        ticker.observables.loopCounter.observe(this) {
             updateCounter()
         }
-        ticker.observables.tick.observe(this) {
+        ticker.observables.tickCounter.observe(this) {
             updateCounter()
         }
         ticker.observables.paused.observe(this) {
@@ -28,44 +28,25 @@ class MainActivity : AppCompatActivity() {
                 pauseButton.text = "Pause"
             }
         }
-        ticker.observables.alive.observe(this) {
+        ticker.observables.busy.observe(this) {
             val alive = it==true
-            squatButton.isEnabled = !alive
-            hiitButton.isEnabled = !alive
+            startButton.isEnabled = !alive
             stopButton.isEnabled = alive
             pauseButton.isEnabled = alive
         }
+        ticker.observables.label.observe(this) {
+            if(it!=null) {
+                trainingName.text = it
+            }
+        }
 
-
-//        val before = System.currentTimeMillis();
-//        Log.d("Ticker", "Before:${before}")
-//        cs.beepRaw(ToneGenerator.TONE_CDMA_DIAL_TONE_LITE,5000)
-//        val after = System.currentTimeMillis();
-//        Log.d("Ticker", "After:${after} (${after-before})")
-
-        squatButton?.setOnClickListener(this::squat)
-        hiitButton?.setOnClickListener(this::hiit)
+        startButton?.setOnClickListener(this::start)
         pauseButton?.setOnClickListener(this::pause)
         stopButton?.setOnClickListener(this::stop)
 
-//        var type = 1
-//        var count = 0
-//        val h = Handler()
-//        val interval = 1000L
-//        val runnable:Runnable = object:Runnable {
-//            override fun run() {
-//                cs.beepRaw(type,200)
-//                h.postDelayed(this, interval)
-//                count++;
-//                if(count==3) {
-//                    count = 0
-//                    type++
-//                    Log.d("Beep", "Type=${type}" )
-//                }
-//            }
-//
-//        }
-//        runnable.run()
+        selectTraining.adapter = ArrayAdapter(this, R.layout.spinner_item, TrainingStore.trainingTitles).apply {
+            setDropDownViewResource(R.layout.spinner_dropdown_item)
+        }
     }
 
     override fun onPause() {
@@ -80,16 +61,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     fun updateCounter() {
-        counterText.text = "${ticker.repeat} - ${ticker.tick}"
+        counterText.text = "${ticker.loopCounter} - ${ticker.tickCounter}"
     }
 
-    fun squat(@Suppress("UNUSED_PARAMETER") view: View) {
-        ticker.start(TickerViewModel.TICKS_SQUAT7, 10)
-    }
-
-    fun hiit(@Suppress("UNUSED_PARAMETER") view: View) {
-        ticker.start(TickerViewModel.TICKS_HIIT, 8)
+    fun start(@Suppress("UNUSED_PARAMETER") view: View) {
+        //Log.d("BT", selectTraining.selectedItem.toString())
+        val t = TrainingStore.trainingOf(selectTraining.selectedItem.toString()) ?: return
+        (t.beat as Phrase?)?.dump()
+        ticker.start(t.beat)
     }
 
     fun pause(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -102,22 +83,4 @@ class MainActivity : AppCompatActivity() {
     fun stop(@Suppress("UNUSED_PARAMETER") view: View) {
         ticker.stop()
     }
-
-
-//    fun onNextBeep(@Suppress("UNUSED_PARAMETER") view: View) {
-//        type++
-//        textView.text = "${type}"
-//        cs.stop()
-//        cs.beepRaw(type,3000)
-//    }
-//
-//    fun onPrevBeep(@Suppress("UNUSED_PARAMETER") view: View) {
-//        if(type>0) {
-//            type--
-//        }
-//        textView.text = "${type}"
-//        cs.stop()
-//        cs.beepRaw(type,3000)
-//    }
-
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 文字サイズ（小） -->
+    <dimen name="sp_s">20sp</dimen>
+    <!-- 文字サイズ（中） -->
+    <dimen name="sp_m">40sp</dimen>
+    <!-- 文字サイズ（大） -->
+    <dimen name="sp_l">150sp</dimen>
+    <!-- 余白などのサイズ（小） -->
+    <dimen name="dp_s">4dp</dimen>
+    <!-- 余白などのサイズ（中） -->
+    <dimen name="dp_m">8dp</dimen>
+    <!-- 余白などのサイズ（大） -->
+    <dimen name="dp_l">16dp</dimen>
+</resources>

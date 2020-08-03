@@ -1,45 +1,30 @@
 package com.michael.beattimer
 
-import android.os.Handler
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class TickerViewModel : ViewModel() {
+class TickerViewModel : ViewModel(), IPlayer {
     companion object {
-        val TICKS_SQUAT7: List<TickType> = listOf(
-            TickType.TICK,
-            TickType.TICK,
-            TickType.TICK,
-            TickType.TICK,
-            TickType.MIDDLE,
-            TickType.TICK,
-            TickType.TICK,
-            TickType.REST,
-            TickType.REST
-        )
-        val TICKS_HIIT: List<TickType> = listOf(
-            TickType.TICK, TickType.TICK, TickType.TICK, TickType.TICK, TickType.SMALL,   // 5
-            TickType.TICK, TickType.TICK, TickType.TICK, TickType.TICK, TickType.SMALL,   // 10
-            TickType.TICK, TickType.TICK, TickType.TICK, TickType.TICK, TickType.SMALL,   // 15
-            TickType.TICK, TickType.TICK, TickType.TICK, TickType.TICK, TickType.MIDDLE,   // 20
-            TickType.SILENT, TickType.SILENT, TickType.SILENT, TickType.SILENT, TickType.SILENT,
-            TickType.SILENT, TickType.SILENT, TickType.TICK, TickType.TICK, TickType.MIDDLE
-        )
         val cs = ClockSound()
         fun getInstance(owner: FragmentActivity): TickerViewModel {
             return ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory()).get(TickerViewModel::class.java)
         }
     }
 
-    private var cancel:Boolean = false
+    private var alive:Boolean = false
 
     val propHolder = PropHolder()
     inner class Observables {
-        val tick:MutableLiveData<Int> by propHolder.propMap
-        val repeat:MutableLiveData<Int> by propHolder.propMap
-        val alive:MutableLiveData<Boolean> by propHolder.propMap
+        val tickCounter:MutableLiveData<Int> by propHolder.propMap
+        val loopCounter:MutableLiveData<Int> by propHolder.propMap
+        val busy:MutableLiveData<Boolean> by propHolder.propMap
         val pausing:MutableLiveData<Boolean> by propHolder.propMap
         val paused:MediatorLiveData<Boolean> by propHolder.propMap
+        val label:MutableLiveData<String> by propHolder.propMap
 
         fun removeObservers(owner:LifecycleOwner) {
             propHolder.removeObservers(owner)
@@ -47,66 +32,17 @@ class TickerViewModel : ViewModel() {
     }
     val observables = Observables()
 
-    var tick:Int by propHolder.addProp("tick", MutableLiveData<Int>(),1)
-    var repeat:Int by propHolder.addProp("repeat", MutableLiveData<Int>(),1)
-    var alive:Boolean by propHolder.addProp("alive", MutableLiveData<Boolean>(),false)
-    var pausing:Boolean by propHolder.addProp("pausing", MutableLiveData<Boolean>(),false)
-    var paused:Boolean by propHolder.addProp("paused", MediatorLiveData<Boolean>().apply {
+    var tickCounter:Int by propHolder.addProp("tickCounter", MutableLiveData(),1)
+    var loopCounter:Int by propHolder.addProp("loopCounter", MutableLiveData(),1)
+    private var label:String? by propHolder.addNullableProp("label", MutableLiveData())
+    private var busy:Boolean by propHolder.addProp("busy", MutableLiveData(),false)
+    private var pausing:Boolean by propHolder.addProp("pausing", MutableLiveData(),false)
+    @Suppress("unused")
+    private var paused:Boolean by propHolder.addProp("paused", MediatorLiveData<Boolean>().apply {
         val cb:(Boolean)->Unit = {_:Boolean-> pausing && alive}
-        addSource(observables.alive,cb)
+        addSource(observables.busy,cb)
         addSource(observables.pausing,cb)
     },false)
-        private set
-
-    fun start(ticks:List<TickType>, loopCount:Int) {
-        if(alive) {
-            return
-        }
-
-        cancel = false
-        repeat = 1
-        tick = 1
-        pausing = false
-        alive = true
-
-        var repeated = 0
-        var index = 0
-        val h = Handler()
-        var last = false
-        val runnable:Runnable = object:Runnable {
-            override fun run() {
-                if(!pausing) {
-                    val t = ticks[index]
-                    if (t.duration > 0) {
-                        tick = index+1
-                    }
-                    if (t.toneType >= 0) {
-                        cs.beep(t)
-                    }
-                    index++
-                    if (index >= ticks.count()) {
-                        index = 0
-                        repeated++
-                        if (repeated < loopCount) {
-                            repeat = repeated + 1
-                        } else {
-                            last = true
-                        }
-                    }
-                }
-                if(!cancel&&!last) {
-                    h.postDelayed(this, 1000)
-                } else {
-                    if(last) {
-                        cs.beep(TickType.PERIOD)
-                    }
-                    alive = false
-                }
-            }
-
-        }
-        runnable.run()
-    }
 
     fun pause() {
         pausing = true
@@ -117,7 +53,62 @@ class TickerViewModel : ViewModel() {
 
 
     fun stop() {
-        cancel = true
+        alive = false
     }
 
+    fun start(target:IBeat) {
+        if(busy) {
+            return
+        }
+
+        busy = true
+        alive = true
+        pausing = false
+        setLoopCount(1)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            target.start(this@TickerViewModel)
+            label = "Let's begin!"
+            busy = false
+            setLoopCount(1)
+        }
+    }
+
+    override fun setLoopCount(count: Int) {
+        loopCounter = count
+        tickCounter = 0
+    }
+
+    override fun resetTickCount() {
+        tickCounter = 0
+    }
+
+    override fun putLabel(label:String) {
+        this.label = label
+    }
+
+    override suspend fun play(tick: TickType, nextTick:Boolean): Boolean {
+        if(!alive) {
+            return false
+        }
+        while(pausing) {
+            delay(100)
+            if(!alive) {
+                return false
+            }
+        }
+        if(nextTick) {
+            this.tickCounter++
+        }
+        if(tick.toneType>=0) {
+            cs.beep(tick)
+        }
+        for(c in 1..10) {
+            if(!alive) {
+                return false
+            }
+            delay(100)
+        }
+        return alive
+    }
 }
