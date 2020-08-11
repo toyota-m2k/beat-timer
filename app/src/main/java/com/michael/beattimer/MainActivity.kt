@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -33,6 +34,11 @@ class MainActivity : AppCompatActivity() {
             startButton.isEnabled = !alive
             stopButton.isEnabled = alive
             pauseButton.isEnabled = alive
+            if(alive) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
         }
         ticker.observables.label.observe(this) {
             if(it!=null) {
