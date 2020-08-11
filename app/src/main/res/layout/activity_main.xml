@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,81 +14,103 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         />
-    <TextView
-        android:id="@+id/trainingName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Let's begin!"
-        android:textSize="@dimen/sp_m"
-        android:textColor="#000"
-        android:layout_marginTop="30dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/selectTraining" />
-    <TextView
-        android:id="@+id/counterText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="1-15"
-        android:textSize="@dimen/sp_l"
-        android:textColor="#000"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/trainingName" />
 
-        <Button
-            android:id="@+id/startButton"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/rootLayout"
+        app:layout_constraintTop_toBottomOf="@+id/selectTraining"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            >
+            <TextView
+                android:id="@+id/trainingName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Let's begin!"
+                android:textSize="@dimen/sp_m"
+                android:textColor="#000"
+                android:layout_gravity="center_horizontal"
+                />
+            <TextView
+                android:id="@+id/counterText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1-15"
+                android:textSize="@dimen/sp_l"
+                android:textColor="#000"
+                android:layout_gravity="center_horizontal"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_gravity="center">
+            <Button
+                android:id="@+id/startButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start"
+                android:layout_marginTop="20dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/counterText"
+                tools:layout_editor_absoluteX="156dp" />
+
+    <!--    <Button-->
+    <!--        android:id="@+id/squatButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="7sec. Squat"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--        app:layout_constraintRight_toRightOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/counterText"-->
+    <!--        tools:layout_editor_absoluteX="156dp" />-->
+
+    <!--    <Button-->
+    <!--        android:id="@+id/hiitButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:text="H.I.I.T"-->
+    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--        app:layout_constraintRight_toRightOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/squatButton"-->
+    <!--        tools:layout_editor_absoluteX="156dp" />-->
+
+        <Button
+            android:id="@+id/pauseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:text="Pause"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/counterText"
+            app:layout_constraintTop_toBottomOf="@+id/startButton"
             tools:layout_editor_absoluteX="156dp" />
 
-<!--    <Button-->
-<!--        android:id="@+id/squatButton"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="7sec. Squat"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/counterText"-->
-<!--        tools:layout_editor_absoluteX="156dp" />-->
-
-<!--    <Button-->
-<!--        android:id="@+id/hiitButton"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        android:text="H.I.I.T"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/squatButton"-->
-<!--        tools:layout_editor_absoluteX="156dp" />-->
-
-    <Button
-        android:id="@+id/pauseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Pause"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startButton"
-        tools:layout_editor_absoluteX="156dp" />
-
-    <Button
-        android:id="@+id/stopButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Stop"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pauseButton"
-        tools:layout_editor_absoluteX="156dp" />
-
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Stop"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pauseButton"
+            tools:layout_editor_absoluteX="156dp" />
+        </LinearLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

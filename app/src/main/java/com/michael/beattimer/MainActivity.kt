@@ -1,11 +1,13 @@
 package com.michael.beattimer
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -88,5 +90,14 @@ class MainActivity : AppCompatActivity() {
     }
     fun stop(@Suppress("UNUSED_PARAMETER") view: View) {
         ticker.stop()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            rootLayout.orientation = LinearLayout.HORIZONTAL
+        } else {
+            rootLayout.orientation = LinearLayout.VERTICAL
+        }
     }
 }
