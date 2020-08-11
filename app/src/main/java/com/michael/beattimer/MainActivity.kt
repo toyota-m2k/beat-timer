@@ -2,12 +2,12 @@ package com.michael.beattimer
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         selectTraining.adapter = ArrayAdapter(this, R.layout.spinner_item, TrainingStore.trainingTitles).apply {
             setDropDownViewResource(R.layout.spinner_dropdown_item)
         }
+        setOrientation(resources.configuration.orientation ==Configuration.ORIENTATION_LANDSCAPE)
     }
 
     override fun onPause() {
@@ -94,7 +95,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        setOrientation(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+    }
+
+    private fun setOrientation(landscape:Boolean) {
+        if(landscape) {
             rootLayout.orientation = LinearLayout.HORIZONTAL
         } else {
             rootLayout.orientation = LinearLayout.VERTICAL
