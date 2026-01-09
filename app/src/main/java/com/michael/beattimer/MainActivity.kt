@@ -8,15 +8,18 @@ import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import com.michael.beattimer.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     val ticker:TickerViewModel by lazy {
         TickerViewModel.getInstance(this)
     }
+    lateinit var controls: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        controls = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(controls.root)
 
         ticker.observables.loopCounter.observe(this) {
             updateCounter()
@@ -26,16 +29,16 @@ class MainActivity : AppCompatActivity() {
         }
         ticker.observables.paused.observe(this) {
             if(it == true) {
-                pauseButton.text = "Resume"
+                controls.pauseButton.text = "Resume"
             } else {
-                pauseButton.text = "Pause"
+                controls.pauseButton.text = "Pause"
             }
         }
         ticker.observables.busy.observe(this) {
             val alive = it==true
-            startButton.isEnabled = !alive
-            stopButton.isEnabled = alive
-            pauseButton.isEnabled = alive
+            controls.startButton.isEnabled = !alive
+            controls.stopButton.isEnabled = alive
+            controls.pauseButton.isEnabled = alive
             if(alive) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             } else {
@@ -44,15 +47,15 @@ class MainActivity : AppCompatActivity() {
         }
         ticker.observables.label.observe(this) {
             if(it!=null) {
-                trainingName.text = it
+                controls.trainingName.text = it
             }
         }
 
-        startButton?.setOnClickListener(this::start)
-        pauseButton?.setOnClickListener(this::pause)
-        stopButton?.setOnClickListener(this::stop)
+        controls.startButton.setOnClickListener(this::start)
+        controls.pauseButton.setOnClickListener(this::pause)
+        controls.stopButton.setOnClickListener(this::stop)
 
-        selectTraining.adapter = ArrayAdapter(this, R.layout.spinner_item, TrainingStore.trainingTitles).apply {
+        controls.selectTraining.adapter = ArrayAdapter(this, R.layout.spinner_item, TrainingStore.trainingTitles).apply {
             setDropDownViewResource(R.layout.spinner_dropdown_item)
         }
         setOrientation(resources.configuration.orientation ==Configuration.ORIENTATION_LANDSCAPE)
@@ -72,18 +75,18 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     fun updateCounter() {
-        counterText.text = "${ticker.loopCounter} - ${ticker.tickCounter}"
+        controls.counterText.text = "${ticker.loopCounter} - ${ticker.tickCounter}"
     }
 
     fun start(@Suppress("UNUSED_PARAMETER") view: View) {
         //Log.d("BT", selectTraining.selectedItem.toString())
-        val t = TrainingStore.trainingOf(selectTraining.selectedItem.toString()) ?: return
+        val t = TrainingStore.trainingOf(controls.selectTraining.selectedItem.toString()) ?: return
         (t.beat as Phrase?)?.dump()
         ticker.start(t.beat)
     }
 
     fun pause(@Suppress("UNUSED_PARAMETER") view: View) {
-        if(pauseButton.text == "Pause") {
+        if(controls.pauseButton.text == "Pause") {
             ticker.pause()
         } else {
             ticker.resume()
@@ -100,9 +103,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setOrientation(landscape:Boolean) {
         if(landscape) {
-            rootLayout.orientation = LinearLayout.HORIZONTAL
+            controls.rootLayout.orientation = LinearLayout.HORIZONTAL
         } else {
-            rootLayout.orientation = LinearLayout.VERTICAL
+            controls.rootLayout.orientation = LinearLayout.VERTICAL
         }
     }
 }
